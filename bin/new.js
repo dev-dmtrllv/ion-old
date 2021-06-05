@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -62,7 +73,7 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
         args[_i - 1] = arguments[_i];
     }
     return __awaiter(void 0, void 0, void 0, function () {
-        var ignoreCheck, config, _a, _b, _c, _d, _, override;
+        var ignoreCheck, config, _a, override, _b, _c, _d, _;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -77,7 +88,7 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
                     args.splice(args.indexOf("-y"), 1);
                     config.name = args[0] || path_1.default.basename(cwd);
                     config.path = config.name == path_1.default.basename(cwd) ? cwd : path_1.default.resolve(cwd, config.name);
-                    return [3 /*break*/, 6];
+                    return [3 /*break*/, 9];
                 case 1:
                     if (!(config.name.length == 0)) return [3 /*break*/, 3];
                     _a = config;
@@ -86,18 +97,29 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
                     _a.name = _e.sent();
                     return [3 /*break*/, 1];
                 case 3:
+                    if (!fs_1.default.existsSync(config.path)) return [3 /*break*/, 5];
+                    return [4 /*yield*/, CLIHandler_1.ask("The folder " + config.path + " already exists! Do you want to reinstall? Y/n", "n")];
+                case 4:
+                    override = _e.sent();
+                    if (override.toLowerCase() != "y")
+                        process.exit();
+                    return [3 /*break*/, 6];
+                case 5:
+                    fs_1.default.mkdirSync(config.path, { recursive: true });
+                    _e.label = 6;
+                case 6:
                     config.path = config.name == path_1.default.basename(cwd) ? cwd : path_1.default.resolve(cwd, config.name);
                     _b = config;
                     return [4 /*yield*/, CLIHandler_1.ask("host", "localhost")];
-                case 4:
+                case 7:
                     _b.host = _e.sent();
                     _c = config;
                     _d = Number;
                     return [4 /*yield*/, CLIHandler_1.ask("port", "80")];
-                case 5:
+                case 8:
                     _c.port = _d.apply(void 0, [_e.sent()]);
-                    _e.label = 6;
-                case 6:
+                    _e.label = 9;
+                case 9:
                     _ = function () {
                         var p = [];
                         for (var _i = 0; _i < arguments.length; _i++) {
@@ -105,18 +127,6 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
                         }
                         return path_1.default.resolve.apply(path_1.default, __spreadArray([config.path], p));
                     };
-                    if (!fs_1.default.existsSync(config.path)) return [3 /*break*/, 8];
-                    return [4 /*yield*/, CLIHandler_1.ask(config.path + " already exists! Do you want to override? Y/n", "n")];
-                case 7:
-                    override = _e.sent();
-                    if (override.toLowerCase() != "y")
-                        process.exit();
-                    return [3 /*break*/, 9];
-                case 8:
-                    fs_1.default.mkdirSync(config.path, { recursive: true });
-                    _e.label = 9;
-                case 9:
-                    // write package.json
                     fs_1.default.writeFileSync(_("package.json"), JSON.stringify({
                         name: config.name,
                         version: "0.1.0",
@@ -125,15 +135,10 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
                             build: "ion build",
                             serve: "ion run"
                         },
-                        // dependencies: require("../package.json").dependencies,
+                        dependencies: __assign(__assign({}, (require("../package.json").dependencies)), { "ion": "github:dev-dmtrllv/ion" }),
                         license: "ISC"
-                    }));
-                    // run(config.path, "npm", "install");
-                    return [4 /*yield*/, run(config.path, "npm", "i", "dev-dmtrllv/ion", "--save")];
-                case 10:
-                    // run(config.path, "npm", "install");
-                    _e.sent();
-                    console.log("Creating project \"" + config.name + "\" in " + config.path + "...");
+                    }), "utf-8");
+                    run(config.path, "npm", "install");
                     return [2 /*return*/];
             }
         });

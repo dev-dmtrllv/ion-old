@@ -3,7 +3,9 @@
 	"version": "0.1.0",
 	"scripts": {
 		"build-cli": "tsc --p cli",
-		"watch-cli": "tsc --watch --p cli"
+		"watch-cli": "tsc --watch --p cli",
+		"build-lib": "tsc",
+		"watch-lib": "tsc --watch"
 	},
 	"license": "ISC",
 	"devDependencies": {
