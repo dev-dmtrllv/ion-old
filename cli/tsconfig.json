@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"moduleResolution": "Node",
+		"experimentalDecorators": true,
+		"module": "CommonJS",
+		"target": "ES5",
+		"pretty": true,
+		"resolveJsonModule": true,
+		"outDir": "../bin",
+		"rootDir": "."
+	}
+}
