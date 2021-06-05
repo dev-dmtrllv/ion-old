@@ -1,14 +1,10 @@
 import { ask, cliHandler } from "./CLIHandler";
 import path from "path";
 import fs from "fs";
-import { spawn } from "child_process";
+import { spawnSync } from "child_process";
 import { platform } from "os";
 
-const run = (cwd: string, cmd: string, ...args: string[]) => new Promise(res => 
-{
-	const p = spawn((platform() === "win32" ? cmd + ".cmd" : cmd) + " " + args.join(" "), { cwd });
-	p.on("exit", res);
-});
+const run = (cwd: string, cmd: string, ...args: string[]) => spawnSync((platform() === "win32" ? cmd + ".cmd" : cmd), args, { cwd, stdio: "inherit" });
 
 export default cliHandler("new", "Creates a new project.", async (cwd, ...args) => 
 {
@@ -39,8 +35,17 @@ export default cliHandler("new", "Creates a new project.", async (cwd, ...args) 
 
 	const _ = (...p: string[]) => path.resolve(config.path, ...p);
 
-	if (!fs.existsSync(config.path))
+	if (fs.existsSync(config.path))
+	{
+		const override = await ask(`${config.path} already exists! Do you want to override? Y/n`, "n");
+		if(override.toLowerCase() != "y")
+			process.exit();
+	}
+	else
+	{
 		fs.mkdirSync(config.path, { recursive: true });
+	}
+
 
 	// write package.json
 	fs.writeFileSync(_("package.json"), JSON.stringify({
@@ -57,7 +62,7 @@ export default cliHandler("new", "Creates a new project.", async (cwd, ...args) 
 
 	// run(config.path, "npm", "install");
 
-	await run(config.path, "npm", "i", "git+https://github.com/dev-dmtrllv/ion.git", "--save");
+	await run(config.path, "npm", "i", "dev-dmtrllv/ion", "--save");
 
 	console.log(`Creating project "${config.name}" in ${config.path}...`);
 });

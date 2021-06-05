@@ -54,10 +54,7 @@ var run = function (cwd, cmd) {
     for (var _i = 2; _i < arguments.length; _i++) {
         args[_i - 2] = arguments[_i];
     }
-    return new Promise(function (res) {
-        var p = child_process_1.spawn((os_1.platform() === "win32" ? cmd + ".cmd" : cmd) + " " + args.join(" "), { cwd: cwd });
-        p.on("exit", res);
-    });
+    return child_process_1.spawnSync((os_1.platform() === "win32" ? cmd + ".cmd" : cmd), args, { cwd: cwd, stdio: "inherit" });
 };
 exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", function (cwd) {
     var args = [];
@@ -65,7 +62,7 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
         args[_i - 1] = arguments[_i];
     }
     return __awaiter(void 0, void 0, void 0, function () {
-        var ignoreCheck, config, _a, _b, _c, _d, _;
+        var ignoreCheck, config, _a, _b, _c, _d, _, override;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -108,8 +105,17 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
                         }
                         return path_1.default.resolve.apply(path_1.default, __spreadArray([config.path], p));
                     };
-                    if (!fs_1.default.existsSync(config.path))
-                        fs_1.default.mkdirSync(config.path, { recursive: true });
+                    if (!fs_1.default.existsSync(config.path)) return [3 /*break*/, 8];
+                    return [4 /*yield*/, CLIHandler_1.ask(config.path + " already exists! Do you want to override? Y/n", "n")];
+                case 7:
+                    override = _e.sent();
+                    if (override.toLowerCase() != "y")
+                        process.exit();
+                    return [3 /*break*/, 9];
+                case 8:
+                    fs_1.default.mkdirSync(config.path, { recursive: true });
+                    _e.label = 9;
+                case 9:
                     // write package.json
                     fs_1.default.writeFileSync(_("package.json"), JSON.stringify({
                         name: config.name,
@@ -123,8 +129,8 @@ exports.default = CLIHandler_1.cliHandler("new", "Creates a new project.", funct
                         license: "ISC"
                     }));
                     // run(config.path, "npm", "install");
-                    return [4 /*yield*/, run(config.path, "npm", "i", "git+https://github.com/dev-dmtrllv/ion.git", "--save")];
-                case 7:
+                    return [4 /*yield*/, run(config.path, "npm", "i", "dev-dmtrllv/ion", "--save")];
+                case 10:
                     // run(config.path, "npm", "install");
                     _e.sent();
                     console.log("Creating project \"" + config.name + "\" in " + config.path + "...");

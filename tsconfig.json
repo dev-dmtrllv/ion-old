@@ -1,0 +1,28 @@
+{
+	"compilerOptions": {
+		"rootDir": "./lib",
+		"outDir": ".",
+		"esModuleInterop": true,
+		"module": "CommonJS",
+		"target": "ES6",
+		"moduleResolution": "Node",
+		"allowSyntheticDefaultImports": true,
+		"strictNullChecks": true,
+		"resolveJsonModule": true,
+		"jsx": "react",
+		"experimentalDecorators": true,
+		"declaration": true,
+		"lib": [
+			"ES2020",
+			"ES2019",
+			"ES2018",
+			"ES2017",
+			"ES2016",
+			"DOM"
+		]
+	},
+	"include": [
+		"./lib/**/*"
+	],
+	"exclude": ["node_modules", "cli/**/*", "bin/**/*", "template-project/**/*"]
+}
